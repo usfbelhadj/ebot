@@ -1,36 +1,93 @@
+import 'dart:convert';
+import 'package:ebot/core/message.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_markdown/flutter_markdown.dart';
 
-class ChatBotScreen extends StatefulWidget {
-  const ChatBotScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
   @override
-  State<ChatBotScreen> createState() => _ChatBotScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatBotScreenState extends State<ChatBotScreen> {
-  final List<Map<String, String>> messages = [
-    {'sender': 'bot', 'text': 'hello'},
-    {'sender': 'user', 'text': 'hi'},
-  ];
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController controller = TextEditingController();
+  final ScrollController scrollController = ScrollController();
 
-  final TextEditingController _controller = TextEditingController();
+  List<Message> messages = [];
+  bool isTyping = false;
+  void sendMessage() async {
+    String text = controller.text;
+    String apiKey = ''; // your Gemini API key
+    controller.clear();
 
-  void sendMessage() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
+    try {
+      if (text.isNotEmpty) {
+        setState(() {
+          messages.insert(0, Message(isUser: true, text: text));
 
-    setState(() {
-      messages.add({'sender': 'user', 'text': text});
-    });
+          isTyping = true;
+        });
 
-    _controller.clear();
+        scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
 
-    // Dummy bot response
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        messages.add({'sender': 'bot', 'text': 'How can I help you?'});
-      });
-    });
+        var response = await http.post(
+          Uri.parse(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey",
+          ),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "contents": [
+              {
+                "role": "user",
+                "parts": [
+                  {
+                    "text":
+                        "You are an English learning assistant. Only answer questions related to learning English. Politely refuse anything else.",
+                  },
+                ],
+              },
+              {
+                "role": "user",
+                "parts": [
+                  {"text": text},
+                ],
+              },
+            ],
+          }),
+        );
+
+        print(response.body);
+
+        if (response.statusCode == 200) {
+          var json = jsonDecode(response.body);
+          String reply = json["candidates"][0]["content"]["parts"][0]["text"];
+
+          setState(() {
+            isTyping = false;
+            messages.insert(0, Message(isUser: false, text: reply.trimRight()));
+          });
+
+          scrollController.animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          print("Failed response: ${response.statusCode}");
+        }
+      }
+    } catch (e) {
+      print("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Some error occurred, please try again!")),
+      );
+    }
   }
 
   @override
@@ -45,7 +102,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'you can ask\nme anything\nyou want',
+                  'Your English Assistant 🤖',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -58,11 +115,13 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
             // Chat messages
             Expanded(
               child: ListView.builder(
+                controller: scrollController,
+                reverse: true,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  final isUser = message['sender'] == 'user';
+                  final isUser = message.isUser;
                   return Align(
                     alignment:
                         isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -72,12 +131,9 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                         vertical: 10,
                         horizontal: 16,
                       ),
-                      constraints: const BoxConstraints(maxWidth: 250),
+                      constraints: const BoxConstraints(maxWidth: 280),
                       decoration: BoxDecoration(
-                        color:
-                            isUser
-                                ? const Color(0xFF002C83)
-                                : Colors.transparent,
+                        color: isUser ? const Color(0xFF002C83) : Colors.white,
                         border: Border.all(color: const Color(0xFF002C83)),
                         borderRadius: BorderRadius.only(
                           topLeft: const Radius.circular(20),
@@ -101,14 +157,30 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                               ),
                             ),
                           Flexible(
-                            child: Text(
-                              message['text']!,
-                              style: TextStyle(
-                                color:
-                                    isUser
-                                        ? Colors.white
-                                        : const Color(0xFF002C83),
-                                fontSize: 16,
+                            child: MarkdownBody(
+                              data: message.text!,
+                              styleSheet: MarkdownStyleSheet(
+                                p: TextStyle(
+                                  fontSize: 16,
+                                  color:
+                                      isUser
+                                          ? Colors.white
+                                          : const Color(0xFF002C83),
+                                ),
+                                strong: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isUser
+                                          ? Colors.white
+                                          : const Color(0xFF002C83),
+                                ),
+                                em: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color:
+                                      isUser
+                                          ? Colors.white
+                                          : const Color(0xFF002C83),
+                                ),
                               ),
                             ),
                           ),
@@ -120,7 +192,14 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               ),
             ),
 
-            // Message input
+            // Typing indicator
+            if (isTyping)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: CircularProgressIndicator(color: Color(0xFF002C83)),
+              ),
+
+            // Message input field
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -133,12 +212,13 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
-                        controller: _controller,
+                        controller: controller,
                         decoration: const InputDecoration(
-                          hintText: 'Ask anything',
+                          hintText: 'Type your question...',
                           border: InputBorder.none,
                           icon: Icon(Icons.person_outline),
                         ),
+                        onSubmitted: (value) => sendMessage(),
                       ),
                     ),
                   ),
@@ -157,29 +237,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         ),
       ),
 
-      // Bottom navigation bar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xFF002C83),
-        unselectedItemColor: Colors.redAccent,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.smart_toy_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
-        ],
-        currentIndex: 1,
-        onTap: (index) {
-          // Navigation logic
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-      ),
+      // Bottom Navigation Bar
     );
   }
 }

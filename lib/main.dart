@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'core/theme.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/chat_bot_screen .dart';
-import 'screens/meal_plan_screen.dart';
 import 'screens/vocabular_quiz_screen .dart';
 
 void main() {
@@ -27,9 +26,7 @@ class EbotApp extends StatelessWidget {
               builder: (context) => const VocabularyQuizScreen(),
             );
           case '/chat-bot':
-            return MaterialPageRoute(
-              builder: (context) => const ChatBotScreen(),
-            );
+            return MaterialPageRoute(builder: (context) => const ChatScreen());
           default:
             return null;
         }
