@@ -1,18 +1,17 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const bodyParser = require('body-parser');
+import express from 'express';
+import nodemailer from 'nodemailer';
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
-const otpStore = {}; // Store OTPs temporarily in memory
+const otpStore = {};
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Use your email service
+  service: 'gmail',
   auth: {
-    user: 'joseph.belhadj@gmail.com', // Replace with your email
-    pass: 'govd wuqj vxeg rprn', // Replace with your email password or app password
+    user: 'joseph.belhadj@gmail.com',
+    pass: 'govd wuqj vxeg rprn',
   },
 });
 
@@ -25,11 +24,11 @@ app.post('/send-otp', (req, res) => {
     return res.status(400).json({ message: 'Email is required' });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000);
   otpStore[email] = otp;
 
   const mailOptions = {
-    from: 'joseph.belhadj@gmail.com', // Replace with your email
+    from: 'joseph.belhadj@gmail.com',
     to: email,
     subject: 'Your OTP Code',
     text: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
@@ -44,7 +43,6 @@ app.post('/send-otp', (req, res) => {
     console.log(`OTP sent to ${email}: ${otp}`);
     res.status(200).json({ message: 'OTP sent successfully' });
 
-    // Expire OTP after 5 minutes
     setTimeout(() => {
       delete otpStore[email];
     }, 5 * 60 * 1000);
@@ -59,23 +57,17 @@ app.post('/verify-otp', (req, res) => {
     return res.status(400).json({ message: 'Email and OTP are required' });
   }
 
-  if (otpStore[email]) {
-    const storedOtp = otpStore[email];
-    if (storedOtp === parseInt(otp, 10)) {
-      delete otpStore[email]; // Remove OTP after successful verification
-      console.log(`OTP verified for ${email}`);
-      return res.status(200).json({ message: 'OTP verified successfully' });
-    } else {
-      console.warn(`Invalid OTP attempt for ${email}: Received ${otp}, Expected ${storedOtp}`);
-    }
-  } else {
-    console.warn(`No OTP found or expired for ${email}`);
+  const storedOtp = otpStore[email];
+  if (storedOtp && storedOtp === parseInt(otp, 10)) {
+    delete otpStore[email];
+    console.log(`OTP verified for ${email}`);
+    return res.status(200).json({ message: 'OTP verified successfully' });
   }
 
+  console.warn(`Invalid or expired OTP for ${email}`);
   res.status(400).json({ message: 'Invalid or expired OTP' });
 });
 
-// Start the server
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`OTP server running on http://localhost:${PORT}`);
