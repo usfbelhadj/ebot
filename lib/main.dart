@@ -4,6 +4,9 @@ import 'core/theme.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/chat_bot_screen .dart';
 import 'screens/vocabular_quiz_screen .dart';
+import 'screens/signup_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/otp_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: EbotApp()));
@@ -17,8 +20,13 @@ class EbotApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ebot',
       theme: buildThemeData(), // defined in core/theme.dart
-      initialRoute: '/',
-      routes: {'/': (context) => const WelcomeScreen()},
+      initialRoute: '/welcome',
+      routes: {
+        '/welcome': (context) => SignupScreen(),
+        '/signup': (context) => SignupScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/otp': (context) => OtpScreen(),
+      },
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/vocabulary-quiz':

@@ -37,6 +37,8 @@ dependencies:
   hooks_riverpod: ^2.6.1
   lottie: ^3.3.1
   flutter_markdown: ^0.7.7
+  fluttertoast: ^8.2.12
+  email_auth: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -55,9 +57,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/images/background.png
-    - assets/images/chatbot_icon.png
-
+    - assets/images/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
