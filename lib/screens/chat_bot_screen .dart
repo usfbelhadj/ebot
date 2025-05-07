@@ -1,8 +1,15 @@
 import 'dart:convert';
-import 'package:ebot/core/message.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_markdown/flutter_markdown.dart';
+
+// Message model class
+class Message {
+  final bool isUser;
+  final String? text;
+
+  Message({required this.isUser, this.text});
+}
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -17,16 +24,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   List<Message> messages = [];
   bool isTyping = false;
+
   void sendMessage() async {
     String text = controller.text;
-    String apiKey = ''; // your Gemini API key
+    String apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
     controller.clear();
 
     try {
       if (text.isNotEmpty) {
         setState(() {
           messages.insert(0, Message(isUser: true, text: text));
-
           isTyping = true;
         });
 
@@ -62,8 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
           }),
         );
 
-        print(response.body);
-
         if (response.statusCode == 200) {
           var json = jsonDecode(response.body);
           String reply = json["candidates"][0]["content"]["parts"][0]["text"];
@@ -79,11 +84,24 @@ class _ChatScreenState extends State<ChatScreen> {
             curve: Curves.easeOut,
           );
         } else {
-          print("Failed response: ${response.statusCode}");
+          // Handle error
+          setState(() {
+            isTyping = false;
+            messages.insert(0, Message(
+                isUser: false,
+                text: "Sorry, I couldn't process your request. Please try again."));
+          });
         }
       }
     } catch (e) {
-      print("Error: $e");
+      // Handle exception
+      setState(() {
+        isTyping = false;
+        messages.insert(0, Message(
+            isUser: false,
+            text: "An error occurred. Please check your connection and try again."));
+      });
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Some error occurred, please try again!")),
       );
@@ -149,11 +167,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           if (!isUser)
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Image.asset(
-                                'assets/images/chatbot_icon.png',
-                                height: 24,
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                Icons.smart_toy,
+                                size: 16,
+                                color: Color(0xFF002C83),
                               ),
                             ),
                           Flexible(
@@ -236,8 +255,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
-
-      // Bottom Navigation Bar
+      // No bottom navigation bar here since it's handled by HomeScreen
     );
   }
 }
