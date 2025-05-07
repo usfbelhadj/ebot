@@ -136,28 +136,28 @@ class _VocabularyQuizScreenState extends State<VocabularyQuizScreen> {
       ),
 
       // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xFF002C83),
-        unselectedItemColor: Colors.redAccent,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.smart_toy_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.emoji_events_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
-        ],
-        currentIndex: 1,
-        onTap: (index) {
-          // Handle navigation here
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   selectedItemColor: const Color(0xFF002C83),
+      //   unselectedItemColor: Colors.redAccent,
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.smart_toy_outlined),
+      //       label: '',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.emoji_events_outlined),
+      //       label: '',
+      //     ),
+      //     BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+      //   ],
+      //   currentIndex: 1,
+      //   onTap: (index) {
+      //     // Handle navigation here
+      //   },
+      //   type: BottomNavigationBarType.fixed,
+      //   backgroundColor: Colors.white,
+      // ),
     );
   }
 }

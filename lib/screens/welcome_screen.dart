@@ -22,7 +22,7 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 300),
+                  const SizedBox(height: 300),
                   const Text(
                     'welcome to',
                     style: TextStyle(
@@ -43,7 +43,7 @@ class WelcomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 50),
 
-                  // 👉 "Next" button
+                  // "Next" button - now navigates to the HomeScreen
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -57,10 +57,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/vocabulary-quiz', // Change this to the correct route
-                      ); // or wherever you're navigating
+                      // Navigate to the HomeScreen instead of vocabulary-quiz
+                      Navigator.pushReplacementNamed(context, '/home');
                     },
                     child: const Text(
                       'Next',
