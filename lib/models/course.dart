@@ -1,4 +1,6 @@
 // lib/models/course.dart
+import 'package:flutter/material.dart';
+
 class Course {
   final String id;
   final String name;
@@ -13,11 +15,22 @@ class Course {
   });
   
   factory Course.fromJson(Map<String, dynamic> json) {
-    return Course(
-      id: json['_id'],
-      name: json['name'],
-      description: json['description'],
-      level: json['level'],
-    );
+    try {
+      return Course(
+        id: json['_id'] ?? '',
+        name: json['name'] ?? 'Unknown Course',
+        description: json['description'] ?? 'No description available',
+        level: json['level'] ?? 'Beginner',
+      );
+    } catch (e) {
+      debugPrint('Error parsing Course: $e');
+      debugPrint('Course JSON: $json');
+      return Course(
+        id: 'error',
+        name: 'Error Loading Course',
+        description: 'There was an error loading this course',
+        level: 'Unknown',
+      );
+    }
   }
 }

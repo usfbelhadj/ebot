@@ -34,17 +34,31 @@ class _EnglishLevelsRoadmapScreenState
 
   Future<void> _loadLevels() async {
     try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      
       final levels = await _apiService.getLevelsForCourse(widget.courseId);
-      print(levels);
-      setState(() {
-        _levels = levels;
-        _isLoading = false;
-      });
+      
+      if (mounted) {
+        setState(() {
+          _levels = levels;
+          _isLoading = false;
+          
+          // If no levels found, set an error message
+          if (levels.isEmpty) {
+            _error = 'No levels found for this course. Make sure you have created levels in the backend.';
+          }
+        });
+      }
     } catch (e) {
-      setState(() {
-        _error = 'Failed to load levels. Please try again.';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = 'Failed to load levels: $e';
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -89,37 +103,36 @@ class _EnglishLevelsRoadmapScreenState
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child:
-                    _isLoading
-                        ? const Center(
-                          child: CircularProgressIndicator(color: Colors.white),
-                        )
-                        : _error != null
-                        ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _error!,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
+                child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    )
+                  : _error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _error!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
                               ),
-                              const SizedBox(height: 20),
-                              ElevatedButton(
-                                onPressed: _loadLevels,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF3B30),
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('Retry'),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _loadLevels,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFF3B30),
+                                foregroundColor: Colors.white,
                               ),
-                            ],
-                          ),
-                        )
-                        : SingleChildScrollView(child: _buildRoadmap(context)),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(child: _buildRoadmap(context)),
               ),
             ),
           ],
@@ -179,38 +192,34 @@ class _EnglishLevelsRoadmapScreenState
 
   Widget _buildLevelCircle(BuildContext context, Level level) {
     return GestureDetector(
-      onTap:
-          level.isUnlocked
-              ? () {
-                // Navigate to the question screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => QuestionScreen(
-                          levelId: level.id,
-                          levelName: level.name,
-                        ),
-                  ),
-                ).then((_) {
-                  // Refresh levels when returning from question screen
-                  _loadLevels();
-                });
-              }
-              : null,
+      onTap: level.isUnlocked
+        ? () {
+            // Navigate to the question screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => QuestionScreen(
+                  levelId: level.id,
+                  levelName: level.name,
+                ),
+              ),
+            ).then((_) {
+              // Refresh levels when returning from question screen
+              _loadLevels();
+            });
+          }
+        : null,
       child: Container(
         width: 100,
         height: 100,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color:
-              level.isUnlocked ? const Color(0xFFFF3B30) : Colors.grey.shade700,
+          color: level.isUnlocked ? const Color(0xFFFF3B30) : Colors.grey.shade700,
           boxShadow: [
             BoxShadow(
-              color:
-                  level.isUnlocked
-                      ? const Color(0xFFFF3B30).withOpacity(0.3)
-                      : Colors.black.withOpacity(0.2),
+              color: level.isUnlocked
+                ? const Color(0xFFFF3B30).withOpacity(0.3)
+                : Colors.black.withOpacity(0.2),
               spreadRadius: 1,
               blurRadius: 6,
               offset: const Offset(0, 4),
@@ -244,9 +253,9 @@ class _EnglishLevelsRoadmapScreenState
 
             // Play button for unlocked levels
             if (level.isUnlocked)
-              Positioned(
+              const Positioned(
                 bottom: 15,
-                child: const Icon(
+                child: Icon(
                   Icons.play_arrow_rounded,
                   color: Colors.white,
                   size: 22,
@@ -259,16 +268,15 @@ class _EnglishLevelsRoadmapScreenState
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color:
-                      level.isUnlocked
-                          ? (level.isCompleted ? Colors.green : Colors.blue)
-                          : Colors.blueGrey,
+                  color: level.isUnlocked
+                    ? (level.isCompleted ? Colors.green : Colors.blue)
+                    : Colors.blueGrey,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   level.isCompleted
-                      ? 'COMPLETED'
-                      : (level.isUnlocked ? 'OPEN' : 'LOCKED'),
+                    ? 'COMPLETED'
+                    : (level.isUnlocked ? 'OPEN' : 'LOCKED'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -292,20 +300,19 @@ class RoadPathPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (levelPositions.isEmpty) return;
+    
     // Paint for the road (wider path)
-    final roadPaint =
-        Paint()
-          ..color = Colors.white.withOpacity(0.15)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 30
-          ..strokeCap = StrokeCap.round;
+    final roadPaint = Paint()
+      ..color = Colors.white.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 30
+      ..strokeCap = StrokeCap.round;
 
     // Create path through all level positions
     final path = Path();
 
     // Get the first level position to start the path
-    if (levelPositions.isEmpty) return;
-
     final firstPosition = levelPositions[0]['position'] as Offset;
     final startX = firstPosition.dx * size.width;
     final startY = firstPosition.dy * size.height;
@@ -335,10 +342,9 @@ class RoadPathPainter extends CustomPainter {
     canvas.drawPath(path, roadPaint);
 
     // Draw small circles for milestones along the road
-    final milestonePaint =
-        Paint()
-          ..color = Colors.white.withOpacity(0.8)
-          ..style = PaintingStyle.fill;
+    final milestonePaint = Paint()
+      ..color = Colors.white.withOpacity(0.8)
+      ..style = PaintingStyle.fill;
 
     for (var levelData in levelPositions) {
       final position = levelData['position'] as Offset;
