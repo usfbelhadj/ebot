@@ -13,12 +13,14 @@ class ApiService {
   // Get auth token from shared preferences
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString('token'));
     return prefs.getString('token');
   }
 
   // Set auth token in shared preferences
   Future<void> setToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
+    print(token);
     await prefs.setString('token', token);
   }
 
@@ -61,6 +63,8 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
+
       if (data['success'] && data['data'] != null) {
         return (data['data'] as List)
             .map((courseJson) => Course.fromJson(courseJson))
@@ -77,6 +81,11 @@ class ApiService {
       Uri.parse('$baseUrl/levels/course/$courseId'),
       headers: headers,
     );
+
+    // print url
+    print(Uri.parse('$baseUrl/levels/course/$courseId'));
+    // print headers
+    print(headers);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -101,6 +110,8 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
+
       if (data['success'] && data['data'] != null) {
         return (data['data'] as List)
             .map((questionJson) => Question.fromJson(questionJson))
@@ -124,6 +135,8 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
+
       if (data['success'] && data['data'] != null) {
         return data['data'];
       }
@@ -141,6 +154,7 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      print(data);
       if (data['success'] && data['data'] != null) {
         return data['data'];
       }

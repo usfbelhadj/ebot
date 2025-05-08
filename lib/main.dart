@@ -1,3 +1,4 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'core/theme.dart';
@@ -7,27 +8,83 @@ import 'screens/signup_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/otp_screen.dart';
 import 'screens/course_selection_screen.dart';
+import 'screens/profile_screen.dart'; // Add this import
+import 'services/auth_service.dart'; // Add this import
 
 void main() {
   runApp(const ProviderScope(child: EbotApp()));
 }
 
-class EbotApp extends StatelessWidget {
+class EbotApp extends StatefulWidget {
   const EbotApp({super.key});
+
+  @override
+  State<EbotApp> createState() => _EbotAppState();
+}
+
+class _EbotAppState extends State<EbotApp> {
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final isLoggedIn = await AuthService.isLoggedIn();
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Ebot',
       theme: buildThemeData(), // defined in core/theme.dart
-      initialRoute: '/welcome',
+      home:
+          _isLoading
+              ? const _SplashScreen() // Show splash screen while checking auth
+              : _isLoggedIn
+              ? const HomeScreen() // Go to home if logged in
+              : const LoginScreen(), // Go to welcome if not logged in
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
-        '/signup': (context) => SignupScreen(),
+        '/signup': (context) => const SignupScreen(),
         '/login': (context) => const LoginScreen(),
         '/otp': (context) => OtpScreen(),
-        '/home': (context) => const HomeScreen(), // Add the new HomeScreen route
+        '/home': (context) => const HomeScreen(),
+        '/profile': (context) => const ProfileScreen(), // Add profile route
       },
+    );
+  }
+}
+
+// Simple splash screen while checking auth status
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF002C83),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App logo could go here
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 20),
+            const Text(
+              'Loading...',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

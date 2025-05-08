@@ -1,7 +1,9 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'chat_bot_screen .dart';
 import 'course_selection_screen.dart';
+import 'profile_screen.dart'; // Add this import
 
 // Provider for the selected tab index
 final selectedTabProvider = StateProvider<int>((ref) => 0);
@@ -14,11 +16,11 @@ class HomeScreen extends HookConsumerWidget {
     // Get current tab index from provider
     final selectedIndex = ref.watch(selectedTabProvider);
 
-    // List of screens to display - now with only 3 screens
+    // List of screens to display - now with profile screen
     final List<Widget> screens = const [
       CourseSelectionScreen(),
       ChatScreen(),
-      EmptyScreen(message: "Profile Screen - Coming Soon"),
+      ProfileScreen(), // Changed from EmptyScreen
     ];
 
     return Scaffold(
@@ -31,7 +33,7 @@ class HomeScreen extends HookConsumerWidget {
     );
   }
 
-  // Method to build the bottom navigation bar - now with only 3 buttons
+  // Method to build the bottom navigation bar
   Widget _buildBottomNavigationBar(
     BuildContext context,
     WidgetRef ref,
@@ -48,37 +50,13 @@ class HomeScreen extends HookConsumerWidget {
         ref.read(selectedTabProvider.notifier).state = index;
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
+        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Learn'),
         BottomNavigationBarItem(
           icon: Icon(Icons.smart_toy_outlined),
-          label: '',
+          label: 'Chat',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
       ],
-    );
-  }
-}
-
-// Simple placeholder for empty screens
-class EmptyScreen extends StatelessWidget {
-  final String message;
-
-  const EmptyScreen({super.key, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFD),
-      body: Center(
-        child: Text(
-          message,
-          style: const TextStyle(
-            color: Color(0xFF002C83),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
     );
   }
 }

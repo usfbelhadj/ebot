@@ -15,10 +15,12 @@ class EnglishLevelsRoadmapScreen extends StatefulWidget {
   });
 
   @override
-  State<EnglishLevelsRoadmapScreen> createState() => _EnglishLevelsRoadmapScreenState();
+  State<EnglishLevelsRoadmapScreen> createState() =>
+      _EnglishLevelsRoadmapScreenState();
 }
 
-class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen> {
+class _EnglishLevelsRoadmapScreenState
+    extends State<EnglishLevelsRoadmapScreen> {
   final ApiService _apiService = ApiService();
   bool _isLoading = true;
   List<Level> _levels = [];
@@ -33,6 +35,7 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
   Future<void> _loadLevels() async {
     try {
       final levels = await _apiService.getLevelsForCourse(widget.courseId);
+      print(levels);
       setState(() {
         _levels = levels;
         _isLoading = false;
@@ -86,40 +89,37 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                      )
-                    : _error != null
+                child:
+                    _isLoading
+                        ? const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                        : _error != null
                         ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _error!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  textAlign: TextAlign.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _error!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: _loadLevels,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF3B30),
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Retry'),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: _loadLevels,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFF3B30),
+                                  foregroundColor: Colors.white,
                                 ),
-                              ],
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            child: _buildRoadmap(context),
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           ),
+                        )
+                        : SingleChildScrollView(child: _buildRoadmap(context)),
               ),
             ),
           ],
@@ -134,12 +134,12 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
 
     // Create level positions - calculate dynamically based on level order
     List<Map<String, dynamic>> levelPositions = [];
-    
+
     for (int i = 0; i < _levels.length; i++) {
       // Create a zig-zag pattern for level positions
       double horizontalPosition = (i % 2 == 0) ? 0.3 : 0.7;
       double verticalPosition = (i + 1) / (_levels.length + 1);
-      
+
       levelPositions.add({
         'level': _levels[i],
         'position': Offset(horizontalPosition, verticalPosition),
@@ -160,18 +160,16 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
           ...levelPositions.map((levelData) {
             Level level = levelData['level'] as Level;
             Offset position = levelData['position'] as Offset;
-            
+
             // Calculate position based on the relative coordinates
-            final double x = position.dx * (MediaQuery.of(context).size.width - 140);
+            final double x =
+                position.dx * (MediaQuery.of(context).size.width - 140);
             final double y = position.dy * totalHeight;
 
             return Positioned(
               left: x,
               top: y,
-              child: _buildLevelCircle(
-                context,
-                level,
-              ),
+              child: _buildLevelCircle(context, level),
             );
           }).toList(),
         ],
@@ -179,48 +177,46 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
     );
   }
 
-  Widget _buildLevelCircle(
-    BuildContext context,
-    Level level,
-  ) {
+  Widget _buildLevelCircle(BuildContext context, Level level) {
     return GestureDetector(
-      onTap: level.isUnlocked
-          ? () {
-              // Navigate to the question screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => QuestionScreen(
-                    levelId: level.id,
-                    levelName: level.name,
+      onTap:
+          level.isUnlocked
+              ? () {
+                // Navigate to the question screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => QuestionScreen(
+                          levelId: level.id,
+                          levelName: level.name,
+                        ),
                   ),
-                ),
-              ).then((_) {
-                // Refresh levels when returning from question screen
-                _loadLevels();
-              });
-            }
-          : null,
+                ).then((_) {
+                  // Refresh levels when returning from question screen
+                  _loadLevels();
+                });
+              }
+              : null,
       child: Container(
         width: 100,
         height: 100,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: level.isUnlocked ? const Color(0xFFFF3B30) : Colors.grey.shade700,
+          color:
+              level.isUnlocked ? const Color(0xFFFF3B30) : Colors.grey.shade700,
           boxShadow: [
             BoxShadow(
-              color: level.isUnlocked 
-                  ? const Color(0xFFFF3B30).withOpacity(0.3) 
-                  : Colors.black.withOpacity(0.2),
+              color:
+                  level.isUnlocked
+                      ? const Color(0xFFFF3B30).withOpacity(0.3)
+                      : Colors.black.withOpacity(0.2),
               spreadRadius: 1,
               blurRadius: 6,
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: Colors.white.withOpacity(0.3),
-            width: 2,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -234,7 +230,7 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
                 fontSize: 32,
               ),
             ),
-            
+
             // Lock icon for locked levels
             if (!level.isUnlocked)
               Positioned(
@@ -245,7 +241,7 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
                   size: 18,
                 ),
               ),
-            
+
             // Play button for unlocked levels
             if (level.isUnlocked)
               Positioned(
@@ -256,24 +252,22 @@ class _EnglishLevelsRoadmapScreenState extends State<EnglishLevelsRoadmapScreen>
                   size: 22,
                 ),
               ),
-              
+
             // Unlock/lock status text
             Positioned(
               top: 15,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: level.isUnlocked 
-                      ? (level.isCompleted ? Colors.green : Colors.blue) 
-                      : Colors.blueGrey,
+                  color:
+                      level.isUnlocked
+                          ? (level.isCompleted ? Colors.green : Colors.blue)
+                          : Colors.blueGrey,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  level.isCompleted 
-                      ? 'COMPLETED' 
+                  level.isCompleted
+                      ? 'COMPLETED'
                       : (level.isUnlocked ? 'OPEN' : 'LOCKED'),
                   style: const TextStyle(
                     color: Colors.white,
@@ -299,56 +293,58 @@ class RoadPathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Paint for the road (wider path)
-    final roadPaint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 30
-      ..strokeCap = StrokeCap.round;
+    final roadPaint =
+        Paint()
+          ..color = Colors.white.withOpacity(0.15)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 30
+          ..strokeCap = StrokeCap.round;
 
     // Create path through all level positions
     final path = Path();
-    
+
     // Get the first level position to start the path
     if (levelPositions.isEmpty) return;
-    
+
     final firstPosition = levelPositions[0]['position'] as Offset;
     final startX = firstPosition.dx * size.width;
     final startY = firstPosition.dy * size.height;
-    
+
     path.moveTo(startX, startY);
-    
+
     // Connect all level positions with a smooth curve
     for (int i = 1; i < levelPositions.length; i++) {
       final position = levelPositions[i]['position'] as Offset;
-      final prevPosition = levelPositions[i-1]['position'] as Offset;
-      
+      final prevPosition = levelPositions[i - 1]['position'] as Offset;
+
       final x = position.dx * size.width;
       final y = position.dy * size.height;
       final prevX = prevPosition.dx * size.width;
       final prevY = prevPosition.dy * size.height;
-      
+
       // Control points for smooth curved road
       final controlX1 = prevX;
       final controlY1 = (prevY + y) / 2;
       final controlX2 = x;
       final controlY2 = (prevY + y) / 2;
-      
+
       path.cubicTo(controlX1, controlY1, controlX2, controlY2, x, y);
     }
-    
+
     // Draw the road (wide path)
     canvas.drawPath(path, roadPaint);
-    
+
     // Draw small circles for milestones along the road
-    final milestonePaint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
-      ..style = PaintingStyle.fill;
-      
+    final milestonePaint =
+        Paint()
+          ..color = Colors.white.withOpacity(0.8)
+          ..style = PaintingStyle.fill;
+
     for (var levelData in levelPositions) {
       final position = levelData['position'] as Offset;
       final x = position.dx * size.width;
       final y = position.dy * size.height;
-      
+
       canvas.drawCircle(Offset(x, y), 5, milestonePaint);
     }
   }
