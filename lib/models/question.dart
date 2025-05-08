@@ -1,4 +1,6 @@
 // lib/models/question.dart
+import 'package:flutter/material.dart';
+
 class QuestionOption {
   final String id;
   final String text;
@@ -11,11 +13,20 @@ class QuestionOption {
   });
   
   factory QuestionOption.fromJson(Map<String, dynamic> json) {
-    return QuestionOption(
-      id: json['_id'],
-      text: json['text'],
-      isCorrect: json['isCorrect'],
-    );
+    try {
+      return QuestionOption(
+        id: json['_id'] ?? '',
+        text: json['text'] ?? 'Unknown Option',
+        isCorrect: json['isCorrect'],
+      );
+    } catch (e) {
+      debugPrint('Error parsing QuestionOption: $e');
+      debugPrint('Option JSON: $json');
+      return QuestionOption(
+        id: 'error',
+        text: 'Error loading option',
+      );
+    }
   }
 }
 
@@ -39,21 +50,39 @@ class Question {
   });
   
   factory Question.fromJson(Map<String, dynamic> json) {
-    List<QuestionOption> optionsList = [];
-    if (json['options'] != null) {
-      optionsList = (json['options'] as List)
-          .map((option) => QuestionOption.fromJson(option))
-          .toList();
+    try {
+      List<QuestionOption> optionsList = [];
+      
+      if (json['options'] != null) {
+        optionsList = (json['options'] as List)
+            .map((option) => QuestionOption.fromJson(option))
+            .toList();
+      }
+      
+      return Question(
+        id: json['_id'] ?? '',
+        text: json['text'] ?? 'Unknown Question',
+        type: json['type'] ?? 'vocabulary',
+        difficultyRating: json['difficultyRating'] ?? 1,
+        options: optionsList,
+        explanation: json['explanation'],
+        isPassed: json['isPassed'] ?? false,
+      );
+    } catch (e) {
+      debugPrint('Error parsing Question: $e');
+      debugPrint('Question JSON: $json');
+      
+      // Return a default question with an error message
+      return Question(
+        id: 'error',
+        text: 'Error loading question',
+        type: 'vocabulary',
+        difficultyRating: 1,
+        options: [
+          QuestionOption(id: 'error', text: 'Error loading options')
+        ],
+        isPassed: false,
+      );
     }
-    
-    return Question(
-      id: json['_id'],
-      text: json['text'],
-      type: json['type'],
-      difficultyRating: json['difficultyRating'] ?? 1,
-      options: optionsList,
-      explanation: json['explanation'],
-      isPassed: json['isPassed'] ?? false,
-    );
   }
 }

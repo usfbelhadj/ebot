@@ -19,6 +19,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // In development, we'll prefill with test credentials
+    usernameController.text = 'admin';
+    passwordController.text = 'password123';
+  }
+
   Future<void> _handleLogin() async {
     setState(() {
       _isLoading = true;
@@ -42,15 +50,21 @@ class _LoginScreenState extends State<LoginScreen> {
         body: jsonEncode({'username': username, 'password': password}),
       );
 
+      debugPrint('Login Response Status: ${response.statusCode}');
+      debugPrint('Login Response Body: ${response.body}');
+
       final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && data['success'] && data['token'] != null) {
+      if (response.statusCode == 200 && data['success'] == true && data['token'] != null) {
         // Save token to shared preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
         
-        // Navigate to home screen
         if (mounted) {
+          // Show success message
+          Fluttertoast.showToast(msg: "Login successful!");
+          
+          // Navigate to home screen
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
@@ -59,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
+      debugPrint('Login error: $e');
       Fluttertoast.showToast(msg: "Network error. Please try again.");
     } finally {
       if (mounted) {
@@ -82,21 +97,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  SizedBox(
-                    height: 120,
-                    child: Image.asset(
-                      'assets/images/logo-wbg.png',
-                      fit: BoxFit.contain,
-                    ),
+                  const Icon(
+                    Icons.language,
+                    size: 120,
+                    color: kBrandColor,
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'Welcome Back',
+                    'Welcome to English Learning App',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
                   _buildLoginForm(),
@@ -137,12 +151,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');
                     },
-                    child: Text(
+                    child: const Text(
                       'Don\'t have an account? Sign Up',
                       style: TextStyle(
                         color: kBrandColor,
                         fontWeight: FontWeight.w500,
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Default login: admin / password123',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
                     ),
                   ),
                   const SizedBox(height: 40),

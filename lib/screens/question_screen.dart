@@ -37,39 +37,60 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   Future<void> _loadQuestions() async {
     try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      
       final questions = await _apiService.getQuestionsForLevel(widget.levelId);
-      print(questions);
-      setState(() {
-        _questions = questions;
-        _isLoading = false;
-      });
+      
+      if (mounted) {
+        setState(() {
+          _questions = questions;
+          _isLoading = false;
+          
+          // If no questions found, set an error message
+          if (questions.isEmpty) {
+            _error = 'No questions found for this level. Make sure you have created questions in the backend.';
+          }
+        });
+      }
     } catch (e) {
-      setState(() {
-        _error = 'Failed to load questions. Please try again.';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = 'Failed to load questions: $e';
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _submitAnswer() async {
     if (_selectedOptionId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select an answer')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an answer'))
+      );
       return;
     }
 
     try {
+      setState(() {
+        _isLoading = true;
+      });
+      
       final result = await _apiService.submitAnswer(
         _questions[_currentQuestionIndex].id,
         _selectedOptionId!,
       );
 
-      setState(() {
-        _showingFeedback = true;
-        _isCorrect = result['isCorrect'] ?? false;
-        _explanation = result['explanation'] ?? 'No explanation available';
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _showingFeedback = true;
+          _isCorrect = result['isCorrect'] ?? false;
+          _explanation = result['explanation'] ?? 'No explanation available';
+        });
+      }
 
       // Show feedback for 2 seconds before moving to next question
       Future.delayed(const Duration(seconds: 2), () {
@@ -86,11 +107,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (context) => CompletionScreen(
-                        levelId: widget.levelId,
-                        levelName: widget.levelName,
-                      ),
+                  builder: (context) => CompletionScreen(
+                    levelId: widget.levelId,
+                    levelName: widget.levelName,
+                  ),
                 ),
               );
             }
@@ -98,9 +118,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error submitting answer: $e')));
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error submitting answer: $e'))
+        );
+      }
     }
   }
 
@@ -119,7 +144,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          '${_questions.isNotEmpty && _currentQuestionIndex < _questions.length ? _questions[_currentQuestionIndex].type.toUpperCase() : ""} Quiz',
+          _questions.isNotEmpty && _currentQuestionIndex < _questions.length 
+              ? '${_questions[_currentQuestionIndex].type.toUpperCase()} Quiz'
+              : "Quiz",
           style: const TextStyle(
             color: Color(0xFF002C83),
             fontWeight: FontWeight.bold,
@@ -128,32 +155,38 @@ class _QuestionScreenState extends State<QuestionScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
+        child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text(
                         _error!,
                         style: const TextStyle(fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _loadQuestions,
-                        child: const Text('Retry'),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _loadQuestions,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF002C83),
+                        foregroundColor: Colors.white,
                       ),
-                    ],
-                  ),
-                )
-                : _questions.isEmpty
-                ? const Center(
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+            : _questions.isEmpty
+              ? const Center(
                   child: Text('No questions available for this level'),
                 )
-                : Padding(
+              : Padding(
                   padding: EdgeInsets.all(screenWidth * 0.06),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -203,84 +236,79 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       SizedBox(height: screenHeight * 0.05),
 
                       // Options grid
-                      Wrap(
-                        spacing: screenWidth * 0.05,
-                        runSpacing: screenHeight * 0.02,
-                        alignment: WrapAlignment.center,
-                        children:
-                            _questions[_currentQuestionIndex].options.map((
-                              option,
-                            ) {
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Wrap(
+                            spacing: screenWidth * 0.05,
+                            runSpacing: screenHeight * 0.02,
+                            alignment: WrapAlignment.center,
+                            children: _questions[_currentQuestionIndex].options.map((option) {
                               final isSelected = _selectedOptionId == option.id;
                               return GestureDetector(
-                                onTap:
-                                    _showingFeedback
-                                        ? null
-                                        : () {
-                                          setState(() {
-                                            _selectedOptionId = option.id;
-                                          });
-                                        },
+                                onTap: _showingFeedback
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          _selectedOptionId = option.id;
+                                        });
+                                      },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
                                   width: screenWidth * 0.4,
                                   padding: EdgeInsets.symmetric(
                                     vertical: screenHeight * 0.02,
+                                    horizontal: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color:
-                                        isSelected
-                                            ? const Color(0xFF002C83)
-                                            : Colors.white,
+                                    color: isSelected
+                                        ? const Color(0xFF002C83)
+                                        : Colors.white,
                                     border: Border.all(
-                                      color:
-                                          isSelected
-                                              ? const Color(0xFF002C83)
-                                              : Colors.redAccent,
+                                      color: isSelected
+                                          ? const Color(0xFF002C83)
+                                          : Colors.redAccent,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(12),
-                                    boxShadow:
-                                        isSelected
-                                            ? [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
-                                                ),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ]
-                                            : [],
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ]
+                                        : [],
                                   ),
                                   child: Center(
                                     child: Text(
                                       option.text,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color:
-                                            isSelected
-                                                ? Colors.white
-                                                : Colors.black87,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.black87,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ),
                               );
                             }).toList(),
+                          ),
+                        ),
                       ),
 
-                      SizedBox(height: screenHeight * 0.05),
+                      SizedBox(height: screenHeight * 0.03),
 
                       // Feedback area
                       if (_showingFeedback)
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color:
-                                _isCorrect
-                                    ? Colors.green[100]
-                                    : Colors.red[100],
+                            color: _isCorrect
+                                ? Colors.green[100]
+                                : Colors.red[100],
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
@@ -289,10 +317,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                 _isCorrect ? 'Correct!' : 'Incorrect',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      _isCorrect
-                                          ? Colors.green[800]
-                                          : Colors.red[800],
+                                  color: _isCorrect
+                                      ? Colors.green[800]
+                                      : Colors.red[800],
                                   fontSize: 18,
                                 ),
                               ),
@@ -300,10 +327,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                               Text(
                                 _explanation ?? '',
                                 style: TextStyle(
-                                  color:
-                                      _isCorrect
-                                          ? Colors.green[800]
-                                          : Colors.red[800],
+                                  color: _isCorrect
+                                      ? Colors.green[800]
+                                      : Colors.red[800],
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -332,6 +358,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                             ),
                           ),
                         ),
+                      SizedBox(height: screenHeight * 0.02),
                     ],
                   ),
                 ),
