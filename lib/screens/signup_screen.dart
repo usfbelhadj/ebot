@@ -1,58 +1,97 @@
+// lib/screens/signup_screen.dart
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // For showing toast messages
-import 'package:email_auth/email_auth.dart'; // For email OTP authentication
-import 'package:http/http.dart' as http; // For making HTTP requests
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color kBrandColor = Color(0xFF8E44AD); // Custom brand purple
 
-class SignupScreen extends StatelessWidget {
-  SignupScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final usernameController = TextEditingController();
   final emailController = TextEditingController();
-  // Add other controllers if needed
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
 
-  void _handleSignup(BuildContext context) async {
+  Future<void> _handleSignup() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+    final username = usernameController.text.trim();
     final email = emailController.text.trim();
-    if (email.isEmpty) {
-      Fluttertoast.showToast(msg: "Email cannot be empty.");
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    // Basic validation
+    if (firstName.isEmpty || lastName.isEmpty || username.isEmpty || 
+        email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: "All fields are required.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (password != confirmPassword) {
+      Fluttertoast.showToast(msg: "Passwords do not match.");
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.56.1:3000/send-otp'),
-        body: {'email': email},
+        Uri.parse('http://10.0.2.2:5000/api/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'firstName': firstName,
+          'lastName': lastName,
+          'username': username,
+          'email': email,
+          'password': password,
+        }),
       );
 
-      if (response.statusCode == 200) {
-        Fluttertoast.showToast(msg: "OTP sent to your email!");
-        Navigator.pushNamed(context, '/otp', arguments: email);
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 201 && data['success'] && data['token'] != null) {
+        // Save token to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token']);
+        
+        Fluttertoast.showToast(msg: "Registration successful!");
+        
+        // Navigate to OTP screen if needed, or directly to home
+        if (mounted) {
+          Navigator.pushNamed(context, '/otp', arguments: email);
+        }
       } else {
-        Fluttertoast.showToast(msg: "Failed to send OTP. Try again.");
+        Fluttertoast.showToast(
+          msg: data['message'] ?? "Registration failed. Please try again.",
+        );
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: "Network error. Failed to send OTP.");
-    }
-  }
-
-  void _handleotp(BuildContext context) {
-    // Simulate OTP verification
-    try {
-      http
-          .post(
-            Uri.parse('http://localhost:3000/send-otp'),
-            body: {'email': 'usf.belhadj@gmail.com'},
-          )
-          .then((response) {
-            if (response.statusCode == 200) {
-              Fluttertoast.showToast(msg: "OTP sent to your email!");
-              Navigator.pushNamed(context, '/otp');
-            } else {
-              Fluttertoast.showToast(msg: "Failed to send OTP. Try again.");
-            }
-          });
-    } catch (e) {
-      Fluttertoast.showToast(msg: "Failed to send OTP. Try again.");
+      Fluttertoast.showToast(msg: "Network error. Please try again.");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -100,16 +139,23 @@ class SignupScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         elevation: 2,
                       ),
-                      onPressed: () {
-                        _handleSignup(context);
-                      },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                      onPressed: _isLoading ? null : _handleSignup,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -138,25 +184,17 @@ class SignupScreen extends StatelessWidget {
   Widget _buildSignupForm() {
     return Column(
       children: [
-        _buildInputField('First Name', Icons.person_outline),
+        _buildInputField('First Name', Icons.person_outline, controller: firstNameController),
         const SizedBox(height: 16),
-        _buildInputField('Last Name', Icons.person_outline),
+        _buildInputField('Last Name', Icons.person_outline, controller: lastNameController),
         const SizedBox(height: 16),
-        _buildInputField('Username', Icons.account_circle_outlined),
+        _buildInputField('Username', Icons.account_circle_outlined, controller: usernameController),
         const SizedBox(height: 16),
-        _buildInputField(
-          'Email',
-          Icons.email_outlined,
-          controller: emailController,
-        ),
+        _buildInputField('Email', Icons.email_outlined, controller: emailController),
         const SizedBox(height: 16),
-        _buildInputField('Password', Icons.lock_outline, isPassword: true),
+        _buildInputField('Password', Icons.lock_outline, isPassword: true, controller: passwordController),
         const SizedBox(height: 16),
-        _buildInputField(
-          'Confirm Password',
-          Icons.lock_outline,
-          isPassword: true,
-        ),
+        _buildInputField('Confirm Password', Icons.lock_outline, isPassword: true, controller: confirmPasswordController),
       ],
     );
   }
@@ -165,12 +203,11 @@ class SignupScreen extends StatelessWidget {
     String label,
     IconData icon, {
     bool isPassword = false,
-    TextEditingController? controller,
+    required TextEditingController controller,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         labelText: label,

@@ -1,9 +1,73 @@
+// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color kBrandColor = Color(0xFF8E44AD); // Custom brand purple
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final username = usernameController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: "Username and password are required.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] && data['token'] != null) {
+        // Save token to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', data['token']);
+        
+        // Navigate to home screen
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: data['message'] ?? "Invalid credentials. Please try again.",
+        );
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Network error. Please try again.");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,16 +113,23 @@ class LoginScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         elevation: 2,
                       ),
-                      onPressed: () {
-                        // Handle login logic
-                      },
-                      child: const Text(
-                        'Log In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                      onPressed: _isLoading ? null : _handleLogin,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Log In',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -87,9 +158,18 @@ class LoginScreen extends StatelessWidget {
   Widget _buildLoginForm() {
     return Column(
       children: [
-        _buildInputField('Username', Icons.person_outline),
+        _buildInputField(
+          'Username',
+          Icons.person_outline,
+          controller: usernameController,
+        ),
         const SizedBox(height: 16),
-        _buildInputField('Password', Icons.lock_outline, isPassword: true),
+        _buildInputField(
+          'Password',
+          Icons.lock_outline,
+          isPassword: true,
+          controller: passwordController,
+        ),
       ],
     );
   }
@@ -98,8 +178,10 @@ class LoginScreen extends StatelessWidget {
     String label,
     IconData icon, {
     bool isPassword = false,
+    required TextEditingController controller,
   }) {
     return TextFormField(
+      controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(

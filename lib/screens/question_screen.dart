@@ -38,6 +38,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Future<void> _loadQuestions() async {
     try {
       final questions = await _apiService.getQuestionsForLevel(widget.levelId);
+      print(questions);
       setState(() {
         _questions = questions;
         _isLoading = false;
@@ -52,9 +53,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   Future<void> _submitAnswer() async {
     if (_selectedOptionId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an answer')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select an answer')));
       return;
     }
 
@@ -76,7 +77,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
           setState(() {
             _showingFeedback = false;
             _selectedOptionId = null;
-            
+
             // Move to next question or completion screen
             if (_currentQuestionIndex < _questions.length - 1) {
               _currentQuestionIndex++;
@@ -85,10 +86,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CompletionScreen(
-                    levelId: widget.levelId,
-                    levelName: widget.levelName,
-                  ),
+                  builder:
+                      (context) => CompletionScreen(
+                        levelId: widget.levelId,
+                        levelName: widget.levelName,
+                      ),
                 ),
               );
             }
@@ -96,9 +98,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting answer: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error submitting answer: $e')));
     }
   }
 
@@ -126,196 +128,213 @@ class _QuestionScreenState extends State<QuestionScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
+        child:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _error!,
-                          style: const TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _loadQuestions,
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  )
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _loadQuestions,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
                 : _questions.isEmpty
-                    ? const Center(
-                        child: Text('No questions available for this level'),
-                      )
-                    : Padding(
-                        padding: EdgeInsets.all(screenWidth * 0.06),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(height: screenHeight * 0.02),
-                            // Progress indicator
-                            Text(
-                              'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
-                              style: const TextStyle(
-                                color: Color(0xFF002C83),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            LinearProgressIndicator(
-                              value: (_currentQuestionIndex + 1) / _questions.length,
-                              backgroundColor: Colors.grey[300],
-                              valueColor: const AlwaysStoppedAnimation<Color>(
-                                Color(0xFF002C83),
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            
-                            // Question type indicator
-                            Text(
-                              _questions[_currentQuestionIndex].type == 'vocabulary'
-                                  ? 'Choose the correct vocabulary word'
-                                  : 'Complete the sentence with the correct grammar',
-                              style: const TextStyle(
-                                color: Color(0xFF002C83),
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            
-                            // Question text
-                            Text(
-                              _questions[_currentQuestionIndex].text,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(height: screenHeight * 0.05),
-                            
-                            // Options grid
-                            Wrap(
-                              spacing: screenWidth * 0.05,
-                              runSpacing: screenHeight * 0.02,
-                              alignment: WrapAlignment.center,
-                              children: _questions[_currentQuestionIndex]
-                                  .options
-                                  .map((option) {
-                                final isSelected = _selectedOptionId == option.id;
-                                return GestureDetector(
-                                  onTap: _showingFeedback
-                                      ? null
-                                      : () {
+                ? const Center(
+                  child: Text('No questions available for this level'),
+                )
+                : Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.06),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: screenHeight * 0.02),
+                      // Progress indicator
+                      Text(
+                        'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
+                        style: const TextStyle(
+                          color: Color(0xFF002C83),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      LinearProgressIndicator(
+                        value: (_currentQuestionIndex + 1) / _questions.length,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Color(0xFF002C83),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+
+                      // Question type indicator
+                      Text(
+                        _questions[_currentQuestionIndex].type == 'vocabulary'
+                            ? 'Choose the correct vocabulary word'
+                            : 'Complete the sentence with the correct grammar',
+                        style: const TextStyle(
+                          color: Color(0xFF002C83),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+
+                      // Question text
+                      Text(
+                        _questions[_currentQuestionIndex].text,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+
+                      // Options grid
+                      Wrap(
+                        spacing: screenWidth * 0.05,
+                        runSpacing: screenHeight * 0.02,
+                        alignment: WrapAlignment.center,
+                        children:
+                            _questions[_currentQuestionIndex].options.map((
+                              option,
+                            ) {
+                              final isSelected = _selectedOptionId == option.id;
+                              return GestureDetector(
+                                onTap:
+                                    _showingFeedback
+                                        ? null
+                                        : () {
                                           setState(() {
                                             _selectedOptionId = option.id;
                                           });
                                         },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    width: screenWidth * 0.4,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: screenHeight * 0.02,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFF002C83)
-                                          : Colors.white,
-                                      border: Border.all(
-                                        color: isSelected
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: screenWidth * 0.4,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenHeight * 0.02,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        isSelected
                                             ? const Color(0xFF002C83)
-                                            : Colors.redAccent,
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: isSelected
-                                          ? [
+                                            : Colors.white,
+                                    border: Border.all(
+                                      color:
+                                          isSelected
+                                              ? const Color(0xFF002C83)
+                                              : Colors.redAccent,
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow:
+                                        isSelected
+                                            ? [
                                               BoxShadow(
-                                                color:
-                                                    Colors.black.withOpacity(0.1),
+                                                color: Colors.black.withOpacity(
+                                                  0.1,
+                                                ),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 4),
                                               ),
                                             ]
-                                          : [],
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        option.text,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: isSelected
-                                              ? Colors.white
-                                              : Colors.black87,
-                                        ),
-                                      ),
-                                    ),
+                                            : [],
                                   ),
-                                );
-                              }).toList(),
-                            ),
-
-                            SizedBox(height: screenHeight * 0.05),
-
-                            // Feedback area
-                            if (_showingFeedback)
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: _isCorrect ? Colors.green[100] : Colors.red[100],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      _isCorrect ? 'Correct!' : 'Incorrect',
+                                  child: Center(
+                                    child: Text(
+                                      option.text,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: _isCorrect ? Colors.green[800] : Colors.red[800],
-                                        fontSize: 18,
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.black87,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      _explanation ?? '',
-                                      style: TextStyle(
-                                        color: _isCorrect ? Colors.green[800] : Colors.red[800],
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              )
-                            else
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF002C83),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                    vertical: 14,
                                   ),
                                 ),
-                                onPressed: _submitAnswer,
-                                child: const Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
+                              );
+                            }).toList(),
+                      ),
+
+                      SizedBox(height: screenHeight * 0.05),
+
+                      // Feedback area
+                      if (_showingFeedback)
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color:
+                                _isCorrect
+                                    ? Colors.green[100]
+                                    : Colors.red[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                _isCorrect ? 'Correct!' : 'Incorrect',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      _isCorrect
+                                          ? Colors.green[800]
+                                          : Colors.red[800],
+                                  fontSize: 18,
                                 ),
                               ),
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                _explanation ?? '',
+                                style: TextStyle(
+                                  color:
+                                      _isCorrect
+                                          ? Colors.green[800]
+                                          : Colors.red[800],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF002C83),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 14,
+                            ),
+                          ),
+                          onPressed: _submitAnswer,
+                          child: const Text(
+                            'Submit',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                      ),
+                    ],
+                  ),
+                ),
       ),
     );
   }
