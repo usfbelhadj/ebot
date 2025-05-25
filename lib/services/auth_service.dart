@@ -11,7 +11,7 @@ class AuthService {
   static Future<bool> isLoggedIn() async {
     final token = await getToken();
     if (token == null) return false;
-    
+
     // Validate token by making a request
     try {
       final response = await getUserProfile();
@@ -49,9 +49,60 @@ class AuthService {
     }
   }
 
+  // Update user profile
+  static Future<Map<String, dynamic>> updateUserProfile(
+    Map<String, dynamic> data,
+  ) async {
+    final token = await getToken();
+    if (token == null) {
+      return {'success': false, 'message': 'Not authenticated'};
+    }
+
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/auth/update'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(data),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
+
+  // Change password
+
+  static Future<Map<String, dynamic>> changePassword(String newPassword) async {
+    final token = await getToken();
+    if (token == null) {
+      return {'success': false, 'message': 'Not authenticated'};
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/change-password'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'new_password': newPassword}),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
+
   // Logout - clear token
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
   }
+
+  static updateProfile(Map<String, String> profileData) {}
 }

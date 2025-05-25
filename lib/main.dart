@@ -10,6 +10,7 @@ import 'screens/otp_screen.dart';
 import 'screens/course_selection_screen.dart';
 import 'screens/profile_screen.dart'; // Add this import
 import 'services/auth_service.dart'; // Add this import
+import 'screens/intro_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: EbotApp()));
@@ -50,10 +51,11 @@ class _EbotAppState extends State<EbotApp> {
               ? const _SplashScreen() // Show splash screen while checking auth
               : _isLoggedIn
               ? const HomeScreen() // Go to home if logged in
-              : const LoginScreen(), // Go to welcome if not logged in
+              : const WelcomeScreen(), // Go to welcome if not logged in
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
         '/signup': (context) => const SignupScreen(),
+        '/intro': (context) => const RobertIntroScreen(),
         '/login': (context) => const LoginScreen(),
         '/otp': (context) => OtpScreen(),
         '/home': (context) => const HomeScreen(),

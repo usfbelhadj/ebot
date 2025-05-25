@@ -35,6 +35,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _handleEditProfile() async {
+    // Navigate to edit profile screen or show edit dialog
+    Fluttertoast.showToast(msg: "Edit profile functionality coming soon!");
+  }
+
   Future<void> _handleLogout() async {
     try {
       await AuthService.logout();
@@ -52,6 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false, // This removes the back arrow
         title: const Text(
           'My Profile',
           style: TextStyle(
@@ -62,79 +68,110 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Color(0xFF002C83)),
-            onPressed: _handleLogout,
+            icon: const Icon(Icons.edit, color: Color(0xFF002C83)),
+            onPressed: _handleEditProfile,
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _userProfile == null
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _userProfile == null
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Failed to load profile',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _loadUserProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF002C83),
-                        ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Profile header
-                      CircleAvatar(
-                        radius: 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Failed to load profile',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _loadUserProfile,
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF002C83),
-                        child: Text(
-                          _getInitials(),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                      ),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile header
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: const Color(0xFF002C83),
+                      child: Text(
+                        _getInitials(),
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _userProfile!['fullName'] ??
+                          '${_userProfile!['firstName']} ${_userProfile!['lastName']}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF002C83),
+                      ),
+                    ),
+                    Text(
+                      _userProfile!['email'],
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Stats section
+                    _buildStatsCard(),
+
+                    const SizedBox(height: 30),
+
+                    // Achievements section
+                    _buildAchievementsCard(),
+
+                    const SizedBox(height: 30),
+
+                    // Logout button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _handleLogout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _userProfile!['fullName'] ?? '${_userProfile!['firstName']} ${_userProfile!['lastName']}',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF002C83),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.logout),
+                            SizedBox(width: 8),
+                            Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        _userProfile!['email'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      
-                      // Stats section
-                      _buildStatsCard(),
-                      
-                      const SizedBox(height: 30),
-                      
-                      // Achievements section
-                      _buildAchievementsCard(),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
     );
   }
 
@@ -148,9 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildStatsCard() {
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -166,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(),
             const SizedBox(height: 10),
-            
+
             // Points
             _buildStatRow(
               'Total Points',
@@ -174,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.stars,
               Colors.amber,
             ),
-            
+
             // Trophies
             _buildStatRow(
               'Trophies',
@@ -182,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.emoji_events,
               Colors.orange,
             ),
-            
+
             // Correct Answers
             _buildStatRow(
               'Correct Answers',
@@ -190,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.check_circle,
               Colors.green,
             ),
-            
+
             // Vocabulary correct
             _buildStatRow(
               'Vocabulary',
@@ -199,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Colors.blue,
               isSubStat: true,
             ),
-            
+
             // Grammar correct
             _buildStatRow(
               'Grammar',
@@ -219,15 +254,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final totalCorrect = _userProfile!['totalCorrectAnswers'] as int;
     final totalWrong = _userProfile!['totalWrongAnswers'] as int;
     final totalAnswers = totalCorrect + totalWrong;
-    final successRate = totalAnswers > 0 
-        ? (totalCorrect / totalAnswers * 100).toStringAsFixed(1) 
-        : '0.0';
-    
+    final successRate =
+        totalAnswers > 0
+            ? (totalCorrect / totalAnswers * 100).toStringAsFixed(1)
+            : '0.0';
+
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -243,7 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const Divider(),
             const SizedBox(height: 10),
-            
+
             // Success Rate
             _buildStatRow(
               'Success Rate',
@@ -251,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.insights,
               Colors.teal,
             ),
-            
+
             // Account Age
             _buildStatRow(
               'Days Learning',
@@ -259,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icons.calendar_today,
               Colors.indigo,
             ),
-            
+
             // Account creation date
             _buildStatRow(
               'Joined',
@@ -273,7 +307,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatRow(String label, String value, IconData icon, Color color, {bool isSubStat = false}) {
+  Widget _buildStatRow(
+    String label,
+    String value,
+    IconData icon,
+    Color color, {
+    bool isSubStat = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(left: isSubStat ? 20 : 0, bottom: 12),
       child: Row(

@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       // Navigate to the HomeScreen instead of vocabulary-quiz
-                      Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.pushReplacementNamed(context, '/intro');
                     },
                     child: const Text(
                       'Next',

@@ -23,8 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     // In development, we'll prefill with test credentials
-    usernameController.text = 'admin';
-    passwordController.text = 'password123';
+    usernameController.text = '';
+    passwordController.text = '';
   }
 
   Future<void> _handleLogin() async {
@@ -55,15 +55,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && data['success'] == true && data['token'] != null) {
+      if (response.statusCode == 200 &&
+          data['success'] == true &&
+          data['token'] != null) {
         // Save token to shared preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
-        
+
         if (mounted) {
           // Show success message
           Fluttertoast.showToast(msg: "Login successful!");
-          
+
           // Navigate to home screen
           Navigator.pushReplacementNamed(context, '/home');
         }
@@ -87,92 +89,99 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  const Icon(
-                    Icons.language,
-                    size: 120,
-                    color: kBrandColor,
+      body: Stack(
+        children: [
+          // Solid Background Color (matching signup)
+          Container(color: const Color(0xFF002C83)),
+
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+
+                // Logo Centered at the Top
+                Center(
+                  child: Image.asset('assets/images/logo-wbg.png', width: 140),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Title
+                const Text(
+                  'Welcome Back',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Welcome to English Learning App',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Form
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: _buildLoginForm(),
                   ),
-                  const SizedBox(height: 40),
-                  _buildLoginForm(),
-                  const SizedBox(height: 30),
-                  SizedBox(
+                ),
+
+                // Bottom Button
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: SizedBox(
                     width: double.infinity,
+                    height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: kBrandColor,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF002C83),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        elevation: 2,
                       ),
                       onPressed: _isLoading ? null : _handleLogin,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF002C83),
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text(
+                                'Log In',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
-                            )
-                          : const Text(
-                              'Log In',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextButton(
+                ),
+
+                // Signup Link
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');
                     },
                     child: const Text(
                       'Don\'t have an account? Sign Up',
                       style: TextStyle(
-                        color: kBrandColor,
+                        color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Default login: admin / password123',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -180,6 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoginForm() {
     return Column(
       children: [
+        const SizedBox(height: 40),
         _buildInputField(
           'Username',
           Icons.person_outline,
@@ -205,27 +215,27 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.black),
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.black87),
-        prefixIcon: Icon(icon, color: kBrandColor),
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white70),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.black54),
+          borderSide: const BorderSide(color: Colors.white54),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: kBrandColor),
+          borderSide: const BorderSide(color: Colors.white),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white.withOpacity(0.1),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
           horizontal: 20,
         ),
       ),
-      cursorColor: kBrandColor,
+      cursorColor: Colors.white,
     );
   }
 }
