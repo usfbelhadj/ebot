@@ -1,4 +1,5 @@
 // lib/screens/profile_screen.dart
+import 'package:ebot/screens/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -36,8 +37,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _handleEditProfile() async {
-    // Navigate to edit profile screen or show edit dialog
-    Fluttertoast.showToast(msg: "Edit profile functionality coming soon!");
+    if (_userProfile == null) {
+      Fluttertoast.showToast(msg: "Profile data not loaded yet.");
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(userProfile: _userProfile!),
+      ),
+    );
   }
 
   Future<void> _handleLogout() async {

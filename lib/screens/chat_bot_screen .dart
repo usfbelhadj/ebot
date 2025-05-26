@@ -27,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void sendMessage() async {
     String text = controller.text;
-    String apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+    String apiKey = '';
     controller.clear();
 
     try {
@@ -87,9 +87,14 @@ class _ChatScreenState extends State<ChatScreen> {
           // Handle error
           setState(() {
             isTyping = false;
-            messages.insert(0, Message(
+            messages.insert(
+              0,
+              Message(
                 isUser: false,
-                text: "Sorry, I couldn't process your request. Please try again."));
+                text:
+                    "Sorry, I couldn't process your request. Please try again.",
+              ),
+            );
           });
         }
       }
@@ -97,11 +102,16 @@ class _ChatScreenState extends State<ChatScreen> {
       // Handle exception
       setState(() {
         isTyping = false;
-        messages.insert(0, Message(
+        messages.insert(
+          0,
+          Message(
             isUser: false,
-            text: "An error occurred. Please check your connection and try again."));
+            text:
+                "An error occurred. Please check your connection and try again.",
+          ),
+        );
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Some error occurred, please try again!")),
       );
