@@ -1,6 +1,7 @@
 // lib/screens/edit_profile_screen.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/api_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -31,12 +33,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _firstNameController.text = widget.userProfile['firstName'] ?? '';
     _lastNameController.text = widget.userProfile['lastName'] ?? '';
+    _usernameController.text = widget.userProfile['username'] ?? '';
   }
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _usernameController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
@@ -63,15 +67,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         );
       }
 
+      // Update username if changed
+      Future<void> _updateUsername() async {
+        try {
+          await ApiService().updateUsername(_usernameController.text);
+        } catch (e) {
+          throw Exception('Failed to update username: $e');
+        }
+      }
+
       // Update password if requested
       if (_isChangingPassword && _newPasswordController.text.isNotEmpty) {
-        final passwordData = {
-          'currentPassword': _currentPasswordController.text,
-          'newPassword': _newPasswordController.text,
-        };
+        final currentPassword = _currentPasswordController.text;
+        final newPassword = _newPasswordController.text;
 
         final passwordResponse = await AuthService.changePassword(
-          passwordData as String,
+          currentPassword,
+          newPassword,
         );
 
         if (!passwordResponse['success']) {
@@ -137,6 +149,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       const Divider(),
+                      const SizedBox(height: 15),
+
+                      // Username
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Username',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter a username';
+                          }
+                          if (value.trim().length < 3) {
+                            return 'Username must be at least 3 characters';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 15),
 
                       // First Name

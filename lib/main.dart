@@ -54,10 +54,10 @@ class _EbotAppState extends State<EbotApp> {
               : const WelcomeScreen(), // Go to welcome if not logged in
       routes: {
         '/welcome': (context) => const WelcomeScreen(),
-        '/signup': (context) => const SignupScreen(),
         '/intro': (context) => const RobertIntroScreen(),
-        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
         '/otp': (context) => OtpScreen(),
+        '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(), // Add profile route
       },

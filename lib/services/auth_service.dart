@@ -76,7 +76,10 @@ class AuthService {
 
   // Change password
 
-  static Future<Map<String, dynamic>> changePassword(String newPassword) async {
+  static Future<Map<String, dynamic>> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
     final token = await getToken();
     if (token == null) {
       return {'success': false, 'message': 'Not authenticated'};
