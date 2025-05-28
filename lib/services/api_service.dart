@@ -268,31 +268,25 @@ class ApiService {
   }
 
   // Update username
-  Future<Map<String, dynamic>> updateUsername(String username) async {
+  Future<void> updateUsername(String username) async {
     try {
       final headers = await _getHeaders();
       final response = await http.put(
-        Uri.parse('$baseUrl/users/update-username'),
+        Uri.parse('$baseUrl/users/username'),
         headers: headers,
         body: jsonEncode({'username': username}),
       );
 
-      final data = jsonDecode(response.body);
+      debugPrint('Update Username Status: ${response.statusCode}');
+      debugPrint('Update Username Response: ${response.body}');
 
-      if (response.statusCode == 200 && data['success'] == true) {
-        return {
-          'success': true,
-          'data': data['data'],
-          'message': data['message'],
-        };
-      } else {
-        return {
-          'success': false,
-          'message': data['message'] ?? 'Failed to update username',
-        };
+      if (response.statusCode != 200) {
+        final data = jsonDecode(response.body);
+        throw Exception(data['message'] ?? 'Failed to update username');
       }
     } catch (e) {
-      return {'success': false, 'message': 'Network error. Please try again.'};
+      debugPrint('Error updating username: $e');
+      throw Exception('Failed to update username: $e');
     }
   }
 

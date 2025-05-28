@@ -94,13 +94,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       }
 
-      final updatedProfile = Map<String, dynamic>.from(widget.userProfile);
-      updatedProfile['firstName'] = _firstNameController.text.trim();
-      updatedProfile['lastName'] = _lastNameController.text.trim();
-      updatedProfile['username'] = _usernameController.text.trim();
-
       Fluttertoast.showToast(msg: "Profile updated successfully!");
-      Navigator.pop(context, updatedProfile); 
+      Navigator.pop(context, true); 
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString().replaceAll('Exception: ', ''));
     } finally {
