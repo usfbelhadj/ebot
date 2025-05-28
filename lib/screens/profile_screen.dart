@@ -36,18 +36,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _handleEditProfile() async {
-    if (_userProfile == null) {
-      Fluttertoast.showToast(msg: "Profile data not loaded yet.");
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditProfileScreen(userProfile: _userProfile!),
-      ),
-    );
+  
+Future<void> _handleEditProfile() async {
+  if (_userProfile == null) {
+    Fluttertoast.showToast(msg: "Profile data not loaded yet.");
+    return;
   }
+  
+  final result = await Navigator.push<bool>(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditProfileScreen(userProfile: _userProfile!),
+    ),
+  );
+  
+  if (result == true) {
+    await _loadUserProfile();
+    Fluttertoast.showToast(msg: "Profile refreshed");
+  }
+}
 
   Future<void> _handleLogout() async {
     try {

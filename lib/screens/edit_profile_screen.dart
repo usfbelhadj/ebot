@@ -54,23 +54,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       // Update profile info
-      final profileData = {
+      final profileData = <String, dynamic>{
         'firstName': _firstNameController.text.trim(),
         'lastName': _lastNameController.text.trim(),
+        'email': widget.userProfile['email'] ?? '',
       };
 
-      final profileResponse = await AuthService.updateProfile(profileData);
+      final profileResponse = await AuthService.updateUserProfile(profileData);
 
-      if (!profileResponse['success']) {
+      if (profileResponse == null || !profileResponse['success']) {
         throw Exception(
-          profileResponse['message'] ?? 'Failed to update profile',
+          profileResponse?['message'] ?? 'Failed to update profile',
         );
       }
 
       // Update username if changed
-      Future<void> _updateUsername() async {
+      if (_usernameController.text.trim() != widget.userProfile['username']) {
         try {
-          await ApiService().updateUsername(_usernameController.text);
+          await ApiService().updateUsername(_usernameController.text.trim());
         } catch (e) {
           throw Exception('Failed to update username: $e');
         }
@@ -86,15 +87,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           newPassword,
         );
 
-        if (!passwordResponse['success']) {
+        if (passwordResponse == null || !passwordResponse['success']) {
           throw Exception(
-            passwordResponse['message'] ?? 'Failed to change password',
+            passwordResponse?['message'] ?? 'Failed to change password',
           );
         }
       }
 
+      final updatedProfile = Map<String, dynamic>.from(widget.userProfile);
+      updatedProfile['firstName'] = _firstNameController.text.trim();
+      updatedProfile['lastName'] = _lastNameController.text.trim();
+      updatedProfile['username'] = _usernameController.text.trim();
+
       Fluttertoast.showToast(msg: "Profile updated successfully!");
-      Navigator.pop(context, true); // Return true to indicate changes were made
+      Navigator.pop(context, updatedProfile); 
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -267,12 +273,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     ? Icons.visibility_off
                                     : Icons.visibility,
                               ),
-                              onPressed:
-                                  () => setState(
-                                    () =>
-                                        _showCurrentPassword =
-                                            !_showCurrentPassword,
-                                  ),
+                              onPressed: () => setState(
+                                () => _showCurrentPassword = !_showCurrentPassword,
+                              ),
                             ),
                           ),
                           validator: (value) {
@@ -299,10 +302,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     ? Icons.visibility_off
                                     : Icons.visibility,
                               ),
-                              onPressed:
-                                  () => setState(
-                                    () => _showNewPassword = !_showNewPassword,
-                                  ),
+                              onPressed: () => setState(
+                                () => _showNewPassword = !_showNewPassword,
+                              ),
                             ),
                           ),
                           validator: (value) {
@@ -329,12 +331,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     ? Icons.visibility_off
                                     : Icons.visibility,
                               ),
-                              onPressed:
-                                  () => setState(
-                                    () =>
-                                        _showConfirmPassword =
-                                            !_showConfirmPassword,
-                                  ),
+                              onPressed: () => setState(
+                                () => _showConfirmPassword = !_showConfirmPassword,
+                              ),
                             ),
                           ),
                           validator: (value) {
@@ -375,23 +374,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child:
-                      _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.save),
-                              SizedBox(width: 8),
-                              Text(
-                                'Save Changes',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.save),
+                            SizedBox(width: 8),
+                            Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ],

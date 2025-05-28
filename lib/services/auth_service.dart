@@ -60,7 +60,7 @@ class AuthService {
 
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/auth/update'),
+        Uri.parse('$baseUrl/users/profile'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -68,7 +68,14 @@ class AuthService {
         body: jsonEncode(data),
       );
 
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message': 'Server error: ${response.statusCode}',
+        };
+      }
     } catch (e) {
       return {'success': false, 'message': 'Error: $e'};
     }
