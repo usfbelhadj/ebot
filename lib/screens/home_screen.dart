@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'chat_bot_screen .dart';
 import 'course_selection_screen.dart';
-import 'profile_screen.dart'; // Add this import
+import 'profile_screen.dart';
+import 'sessions_screen.dart'; 
 
 // Provider for the selected tab index
 final selectedTabProvider = StateProvider<int>((ref) => 0);
@@ -16,11 +17,11 @@ class HomeScreen extends HookConsumerWidget {
     // Get current tab index from provider
     final selectedIndex = ref.watch(selectedTabProvider);
 
-    // List of screens to display - now with profile screen
     final List<Widget> screens = const [
       CourseSelectionScreen(),
+      SessionsScreen(), 
       ChatScreen(),
-      ProfileScreen(), // Changed from EmptyScreen
+      ProfileScreen(),
     ];
 
     return Scaffold(
@@ -34,25 +35,27 @@ class HomeScreen extends HookConsumerWidget {
             child: Column(
               children: [
                 // Top header with logo
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Column(
-                    children: [
-                      // Logo
-                      Image.asset('assets/images/logo-wbg.png', width: 120),
-                      const SizedBox(height: 10),
-                      // Welcome text
-                      const Text(
-                        'English Learning App',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                if (selectedIndex == 0) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      children: [
+                        // Logo
+                        Image.asset('assets/images/logo-wbg.png', width: 120),
+                        const SizedBox(height: 10),
+                        // Welcome text
+                        const Text(
+                          'English Learning App',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                ],
 
                 // Content area with white background
                 Expanded(
@@ -114,11 +117,11 @@ class HomeScreen extends HookConsumerWidget {
         unselectedItemColor: Colors.grey.shade600,
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: 12,
+          fontSize: 11,
         ),
         unselectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: 12,
+          fontSize: 11,
         ),
         currentIndex: selectedIndex,
         onTap: (index) {
@@ -128,51 +131,87 @@ class HomeScreen extends HookConsumerWidget {
         items: [
           BottomNavigationBarItem(
             icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration:
-                  selectedIndex == 0
-                      ? BoxDecoration(
-                        color: const Color(0xFF002C83).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      : null,
+              padding: const EdgeInsets.all(6),
+              decoration: selectedIndex == 0
+                  ? BoxDecoration(
+                      color: const Color(0xFF002C83).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    )
+                  : null,
               child: Icon(
                 selectedIndex == 0 ? Icons.home : Icons.home_outlined,
-                size: 24,
+                size: 22,
               ),
             ),
             label: 'Learn',
           ),
+          
+          // Sessions Tab
           BottomNavigationBarItem(
             icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration:
-                  selectedIndex == 1
-                      ? BoxDecoration(
-                        color: const Color(0xFF002C83).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      : null,
+              padding: const EdgeInsets.all(6),
+              decoration: selectedIndex == 1
+                  ? BoxDecoration(
+                      color: const Color(0xFF002C83).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    )
+                  : null,
+              child: Stack(
+                children: [
+                  Icon(
+                    selectedIndex == 1 ? Icons.live_tv : Icons.live_tv_outlined,
+                    size: 22,
+                  ),
+                  // Live indicator dot
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            label: 'Sessions',
+          ),
+          
+          // Chat Tab
+          BottomNavigationBarItem(
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: selectedIndex == 2
+                  ? BoxDecoration(
+                      color: const Color(0xFF002C83).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    )
+                  : null,
               child: Icon(
-                selectedIndex == 1 ? Icons.smart_toy : Icons.smart_toy_outlined,
-                size: 24,
+                selectedIndex == 2 ? Icons.smart_toy : Icons.smart_toy_outlined,
+                size: 22,
               ),
             ),
             label: 'Chat',
           ),
+          
+          // Profile Tab
           BottomNavigationBarItem(
             icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration:
-                  selectedIndex == 2
-                      ? BoxDecoration(
-                        color: const Color(0xFF002C83).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      )
-                      : null,
+              padding: const EdgeInsets.all(6),
+              decoration: selectedIndex == 3
+                  ? BoxDecoration(
+                      color: const Color(0xFF002C83).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    )
+                  : null,
               child: Icon(
-                selectedIndex == 2 ? Icons.person : Icons.person_outline,
-                size: 24,
+                selectedIndex == 3 ? Icons.person : Icons.person_outline,
+                size: 22,
               ),
             ),
             label: 'Profile',
