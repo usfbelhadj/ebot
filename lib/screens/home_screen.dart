@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'chat_bot_screen .dart';
 import 'course_selection_screen.dart';
 import 'profile_screen.dart';
-import 'sessions_screen.dart'; 
+import 'sessions_screen.dart';
 
 // Provider for the selected tab index
 final selectedTabProvider = StateProvider<int>((ref) => 0);
@@ -19,7 +19,7 @@ class HomeScreen extends HookConsumerWidget {
 
     final List<Widget> screens = const [
       CourseSelectionScreen(),
-      SessionsScreen(), 
+      SessionsScreen(),
       ChatScreen(),
       ProfileScreen(),
     ];
@@ -28,7 +28,7 @@ class HomeScreen extends HookConsumerWidget {
       body: Stack(
         children: [
           // Blue background matching other screens
-          Container(color: const Color(0xFF002C83)),
+          Container(color: const Color.fromARGB(255, 255, 255, 255)),
 
           // Main content with IndexedStack
           SafeArea(
@@ -41,13 +41,13 @@ class HomeScreen extends HookConsumerWidget {
                     child: Column(
                       children: [
                         // Logo
-                        Image.asset('assets/images/logo-wbg.png', width: 120),
+                        Image.asset('assets/images/logo-bg.png', width: 120),
                         const SizedBox(height: 10),
                         // Welcome text
                         const Text(
-                          'English Learning App',
+                          'Your Fast Track\nTo Fluent English',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Color(0xFF002C83),
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
@@ -132,12 +132,13 @@ class HomeScreen extends HookConsumerWidget {
           BottomNavigationBarItem(
             icon: Container(
               padding: const EdgeInsets.all(6),
-              decoration: selectedIndex == 0
-                  ? BoxDecoration(
-                      color: const Color(0xFF002C83).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : null,
+              decoration:
+                  selectedIndex == 0
+                      ? BoxDecoration(
+                        color: const Color(0xFF002C83).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                      : null,
               child: Icon(
                 selectedIndex == 0 ? Icons.home : Icons.home_outlined,
                 size: 22,
@@ -145,17 +146,18 @@ class HomeScreen extends HookConsumerWidget {
             ),
             label: 'Learn',
           ),
-          
+
           // Sessions Tab
           BottomNavigationBarItem(
             icon: Container(
               padding: const EdgeInsets.all(6),
-              decoration: selectedIndex == 1
-                  ? BoxDecoration(
-                      color: const Color(0xFF002C83).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : null,
+              decoration:
+                  selectedIndex == 1
+                      ? BoxDecoration(
+                        color: const Color(0xFF002C83).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                      : null,
               child: Stack(
                 children: [
                   Icon(
@@ -180,17 +182,18 @@ class HomeScreen extends HookConsumerWidget {
             ),
             label: 'Sessions',
           ),
-          
+
           // Chat Tab
           BottomNavigationBarItem(
             icon: Container(
               padding: const EdgeInsets.all(6),
-              decoration: selectedIndex == 2
-                  ? BoxDecoration(
-                      color: const Color(0xFF002C83).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : null,
+              decoration:
+                  selectedIndex == 2
+                      ? BoxDecoration(
+                        color: const Color(0xFF002C83).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                      : null,
               child: Icon(
                 selectedIndex == 2 ? Icons.smart_toy : Icons.smart_toy_outlined,
                 size: 22,
@@ -198,17 +201,18 @@ class HomeScreen extends HookConsumerWidget {
             ),
             label: 'Chat',
           ),
-          
+
           // Profile Tab
           BottomNavigationBarItem(
             icon: Container(
               padding: const EdgeInsets.all(6),
-              decoration: selectedIndex == 3
-                  ? BoxDecoration(
-                      color: const Color(0xFF002C83).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    )
-                  : null,
+              decoration:
+                  selectedIndex == 3
+                      ? BoxDecoration(
+                        color: const Color(0xFF002C83).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                      : null,
               child: Icon(
                 selectedIndex == 3 ? Icons.person : Icons.person_outline,
                 size: 22,

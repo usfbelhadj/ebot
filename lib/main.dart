@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:quicklish/screens/english_levels_roadmap_screen.dart';
 import 'core/theme.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/home_screen.dart';
@@ -44,7 +45,7 @@ class _EbotAppState extends State<EbotApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ebot',
+      title: 'Quicklish',
       theme: buildThemeData(), // defined in core/theme.dart
       home:
           _isLoading
@@ -60,6 +61,7 @@ class _EbotAppState extends State<EbotApp> {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(), // Add profile route
+        '/course-selection': (context) => const CourseSelectionScreen(),
       },
     );
   }

@@ -10,7 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
   final String baseUrl = 'http://10.0.2.2:5000/api'; // For Android emulator
-  // Use 'http://localhost:5000/api' for iOS simulator
+  // Use 'http://10.0.2.2:5000/api' for iOS simulator
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   // Get auth token from shared preferences

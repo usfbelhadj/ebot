@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl = 'http://10.0.2.2:5000/api'; // Android emulator
-  // Use 'http://localhost:5000/api' for iOS simulator
+  // Use 'http://10.0.2.2:5000/api' for iOS simulator
 
   // Check if user is logged in
   static Future<bool> isLoggedIn() async {

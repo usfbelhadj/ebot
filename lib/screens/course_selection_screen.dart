@@ -29,17 +29,18 @@ class _CourseSelectionScreenState extends State<CourseSelectionScreen> {
         _isLoading = true;
         _error = null;
       });
-      
+
       final courses = await _apiService.getCourses();
-      
+
       if (mounted) {
         setState(() {
           _courses = courses;
           _isLoading = false;
-          
+
           // If no courses found, set an error message
           if (courses.isEmpty) {
-            _error = 'No courses found. Make sure you have created courses in the backend.';
+            _error =
+                'No courses found. Make sure you have created courses in the backend.';
           }
         });
       }
@@ -56,101 +57,104 @@ class _CourseSelectionScreenState extends State<CourseSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF002C83),
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              )
-            : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _error!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+          child:
+              _isLoading
+                  ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF002C83)),
+                  )
+                  : _error != null
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _error!,
+                          style: const TextStyle(
+                            color: Color(0xFF002C83),
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _loadCourses,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF3B30),
-                          foregroundColor: Colors.white,
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _loadCourses,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF3B30),
+                            foregroundColor: Color(0xFF002C83),
+                          ),
+                          child: const Text('Retry'),
                         ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 120),
-                    // Title text
-                    const Text(
-                      'Choose current\ncourse !',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 40),
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 120),
+                      // Title text
+                      const Text(
+                        'Choose current course !',
+                        style: TextStyle(
+                          color: Color(0xFF002C83),
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
 
-                    // List of courses
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: _courses.length,
-                        itemBuilder: (context, index) {
-                          final course = _courses[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EnglishLevelsRoadmapScreen(
-                                        courseId: course.id,
-                                        courseName: course.name,
+                      // List of courses
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: _courses.length,
+                          itemBuilder: (context, index) {
+                            final course = _courses[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                EnglishLevelsRoadmapScreen(
+                                                  courseId: course.id,
+                                                  courseName: course.name,
+                                                ),
                                       ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFF3B30),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
                                     ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF3B30),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                ),
-                                child: Text(
-                                  course.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                  child: Text(
+                                    course.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
         ),
       ),
     );

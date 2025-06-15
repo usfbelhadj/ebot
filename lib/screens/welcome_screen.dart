@@ -6,70 +6,53 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF002C83), // Dark blue
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.png'),
-            fit: BoxFit.cover,
-            opacity: 0.5,
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 300),
-                  const Text(
-                    'welcome to',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Recap with CAC',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255), // Dark blue
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo Centered at the Top
+                Center(child: Image.asset('assets/images/logo-bg.png')),
+                SizedBox(height: 20),
 
-                  const SizedBox(height: 50),
+                const Text(
+                  'Your Fast Track to Fluent English',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF002C83),
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-                  // "Next" button - now navigates to the HomeScreen
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF002C83),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 14,
-                      ),
+                const SizedBox(height: 50),
+
+                // "Next" button - now navigates to the HomeScreen
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFE30613),
+                    foregroundColor: Color(0xFFFFFFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                    onPressed: () {
-                      // Navigate to the HomeScreen instead of vocabulary-quiz
-                      Navigator.pushReplacementNamed(context, '/intro');
-                    },
-                    child: const Text(
-                      'Next',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 14,
                     ),
                   ),
-                ],
-              ),
+                  onPressed: () {
+                    // Navigate to the HomeScreen instead of vocabulary-quiz
+                    Navigator.pushReplacementNamed(context, '/intro');
+                  },
+                  child: const Text(
+                    'Next',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

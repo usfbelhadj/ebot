@@ -1,5 +1,5 @@
 // lib/screens/profile_screen.dart
-import 'package:ebot/screens/edit_profile_screen.dart';
+import 'package:quicklish/screens/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -13,7 +13,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
-  bool _isNavigating = false; 
+  bool _isNavigating = false;
   Map<String, dynamic>? _userProfile;
 
   @override
@@ -24,14 +24,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUserProfile() async {
     if (!mounted) return;
-    
+
     try {
       setState(() {
         _isLoading = true;
       });
-      
+
       final response = await AuthService.getUserProfile();
-      
+
       if (mounted) {
         setState(() {
           _userProfile = response['success'] ? response['data'] : null;
@@ -55,11 +55,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
       return;
     }
-    
+
     setState(() {
       _isNavigating = true;
     });
-    
+
     try {
       final result = await Navigator.push<bool>(
         context,
@@ -67,12 +67,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           builder: (context) => EditProfileScreen(userProfile: _userProfile!),
         ),
       );
-      
+
       if (mounted) {
         setState(() {
           _isNavigating = false;
         });
-        
+
         if (result == true) {
           await _loadUserProfile();
           Fluttertoast.showToast(msg: "Profile refreshed");
@@ -90,11 +90,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _handleLogout() async {
     if (_isNavigating) return;
-    
+
     setState(() {
       _isNavigating = true;
     });
-    
+
     try {
       await AuthService.logout();
       if (mounted) {
@@ -129,101 +129,101 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: _isNavigating 
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Color(0xFF002C83),
-                    ),
-                  )
-                : const Icon(Icons.edit, color: Color(0xFF002C83)),
+            icon:
+                _isNavigating
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF002C83),
+                      ),
+                    )
+                    : const Icon(Icons.edit, color: Color(0xFF002C83)),
             onPressed: _isNavigating ? null : _handleEditProfile,
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _userProfile == null
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _userProfile == null
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Failed to load profile',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _isLoading ? null : _loadUserProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF002C83),
-                        ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Profile header
-                      CircleAvatar(
-                        radius: 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Failed to load profile',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _loadUserProfile,
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF002C83),
-                        child: Text(
-                          _getInitials(),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _userProfile!['fullName'] ??
-                            '${_userProfile!['firstName']} ${_userProfile!['lastName']}',
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile header
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: const Color(0xFF002C83),
+                      child: Text(
+                        _getInitials(),
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF002C83),
+                          color: Colors.white,
                         ),
                       ),
-                      Text(
-                        _userProfile!['email'] ?? 'No email',
-                        style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _userProfile!['fullName'] ??
+                          '${_userProfile!['firstName']} ${_userProfile!['lastName']}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF002C83),
                       ),
-                      const SizedBox(height: 30),
+                    ),
 
-                      // Stats section
-                      _buildStatsCard(),
+                    const SizedBox(height: 30),
 
-                      const SizedBox(height: 30),
+                    // Stats section
+                    _buildStatsCard(),
 
-                      // Achievements section
-                      _buildAchievementsCard(),
+                    const SizedBox(height: 30),
 
-                      const SizedBox(height: 30),
+                    // Achievements section
+                    _buildAchievementsCard(),
 
-                      // Logout button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isNavigating ? null : _handleLogout,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                    const SizedBox(height: 30),
+
+                    // Logout button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isNavigating ? null : _handleLogout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          child: _isNavigating
-                              ? const SizedBox(
+                        ),
+                        child:
+                            _isNavigating
+                                ? const SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
@@ -231,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Row(
+                                : const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.logout),
@@ -245,11 +245,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ],
                                 ),
-                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
     );
   }
 

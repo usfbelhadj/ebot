@@ -89,10 +89,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Solid Background Color (matching signup)
-          Container(color: const Color(0xFF002C83)),
+          Container(color: const Color.fromARGB(255, 255, 255, 255)),
 
           SafeArea(
             child: Column(
@@ -101,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Logo Centered at the Top
                 Center(
-                  child: Image.asset('assets/images/logo-wbg.png', width: 140),
+                  child: Image.asset('assets/images/logo-bg.png', width: 140),
                 ),
 
                 const SizedBox(height: 20),
@@ -110,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF002C83),
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -134,8 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF002C83),
+                        backgroundColor: Color(0xFFE30613),
+                        foregroundColor: Color(0xFFFFFFFF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -172,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text(
                       'Don\'t have an account? Sign Up',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black54,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -210,32 +211,40 @@ class _LoginScreenState extends State<LoginScreen> {
     String label,
     IconData icon, {
     bool isPassword = false,
-    required TextEditingController controller,
+    TextEditingController? controller,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: Icon(icon, color: Colors.black54),
+        filled: true,
+        fillColor: Colors.grey.shade100, // subtle light background
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white54),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black26, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE30613), width: 2),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
           horizontal: 20,
         ),
       ),
-      cursorColor: Colors.white,
+      cursorColor: const Color(0xFF002C83),
     );
   }
 }

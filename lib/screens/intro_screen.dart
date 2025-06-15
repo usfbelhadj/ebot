@@ -12,7 +12,11 @@ class RobertIntroScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF3E56FF), Color(0xFF8F00FF)],
+                colors: [
+                  Color(0xFFE30613), // Red
+                  Color(0xFFFFFFFF), // White
+                  Color(0xFF002C83), // Blue
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -26,40 +30,26 @@ class RobertIntroScreen extends StatelessWidget {
                 const Spacer(),
 
                 // Header Text
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    "Hello, i'm Robert\n your new study buddy",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
 
                 // Robot Illustration Placeholder
                 Image.asset(
-                  'assets/images/logo-wbg.png', // Add your robot asset here
+                  'assets/images/logo-bg.png', // Add your robot asset here
                   height: 150,
                 ),
 
-                const SizedBox(height: 30),
+                Spacer(flex: 2),
 
                 // Subtext
-                const Text(
-                  "You can ask me\nanything you want",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 20,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1.2,
-                    height: 1.5,
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    "Welcome to Quicklish, your AI-powered English learning companion!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFE30613),
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
 

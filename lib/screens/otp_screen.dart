@@ -102,10 +102,11 @@ class _OtpScreenState extends State<OtpScreen> {
     final String email = ModalRoute.of(context)!.settings.arguments as String;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Solid Background Color (matching signup)
-          Container(color: const Color(0xFF002C83)),
+          Container(color: const Color.fromARGB(255, 255, 255, 255)),
 
           SafeArea(
             child: Column(
@@ -114,7 +115,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
                 // Logo Centered at the Top
                 Center(
-                  child: Image.asset('assets/images/logo-wbg.png', width: 140),
+                  child: Image.asset('assets/images/logo-bg.png', width: 140),
                 ),
 
                 const SizedBox(height: 20),
@@ -123,7 +124,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 const Text(
                   'Verify OTP',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF002C83),
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -141,7 +142,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         Text(
                           'Enter the 6-digit code sent to',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Color(0xFFE30613),
                             fontSize: 16,
                           ),
                           textAlign: TextAlign.center,
@@ -173,8 +174,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF002C83),
+                        backgroundColor: Color(0xFFE30613),
+                        foregroundColor: Color(0xFFFFFFFF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -216,7 +217,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     child: const Text(
                       'Back to Registration',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black54,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -234,20 +235,20 @@ class _OtpScreenState extends State<OtpScreen> {
     return TextFormField(
       controller: otpController,
       keyboardType: TextInputType.number,
-      style: const TextStyle(color: Colors.white, fontSize: 18),
+      style: const TextStyle(color: Colors.black87, fontSize: 18),
       maxLength: 6,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
         labelText: 'Enter OTP',
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: Icon(Icons.lock_outline, color: Colors.black54),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white54),
+          borderSide: const BorderSide(color: Colors.black26, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Color(0xFFE30613), width: 2),
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
@@ -267,10 +268,10 @@ class _OtpScreenState extends State<OtpScreen> {
       child: Text(
         'Didn\'t receive the code? Resend OTP',
         style: TextStyle(
-          color: Colors.white.withOpacity(0.8),
+          color: Color(0xFFE30613),
           fontWeight: FontWeight.w500,
           decoration: TextDecoration.underline,
-          decorationColor: Colors.white.withOpacity(0.8),
+          decorationColor: Colors.black54.withOpacity(0.8),
         ),
       ),
     );

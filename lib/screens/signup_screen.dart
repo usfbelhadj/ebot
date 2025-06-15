@@ -5,8 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const Color kBrandColor = Color(0xFF8E44AD); // Custom brand purple
-
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -103,10 +101,11 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Solid Background Color
-          Container(color: const Color(0xFF002C83)),
+          Container(color: const Color.fromARGB(255, 255, 255, 255)),
 
           SafeArea(
             child: Column(
@@ -115,7 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 // Logo Centered at the Top
                 Center(
-                  child: Image.asset('assets/images/logo-wbg.png', width: 140),
+                  child: Image.asset('assets/images/logo-bg.png', width: 140),
                 ),
 
                 const SizedBox(height: 20),
@@ -124,7 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const Text(
                   'Create an Account',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF002C83),
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -148,8 +147,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF002C83),
+                        backgroundColor: Color(0xFFE30613),
+                        foregroundColor: Color(0xFFFFFFFF),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50),
                         ),
@@ -176,7 +175,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: const Text(
                       'Already have an account? Log In',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black54,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -243,27 +242,35 @@ class _SignupScreenState extends State<SignupScreen> {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        labelStyle: const TextStyle(color: Colors.black54),
+        prefixIcon: Icon(icon, color: Colors.black54),
+        filled: true,
+        fillColor: Colors.grey.shade100, // subtle light background
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white54),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black26, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE30613), width: 2),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
           horizontal: 20,
         ),
       ),
-      cursorColor: Colors.white,
+      cursorColor: const Color(0xFF002C83),
     );
   }
 }
