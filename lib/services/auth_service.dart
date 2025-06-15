@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://10.0.2.2:5000/api'; // Android emulator
+  static const String baseUrl =
+      'https://039c-196-229-192-158.ngrok-free.app/api'; // Android emulator
   // Use 'http://10.0.2.2:5000/api' for iOS simulator
 
   // Check if user is logged in
