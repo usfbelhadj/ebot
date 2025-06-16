@@ -30,7 +30,7 @@ class _OtpScreenState extends State<OtpScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://039c-196-229-192-158.ngrok-free.app/api/auth/verify-otp',
+          'https://3e16-165-50-112-219.ngrok-free.app/api/auth/verify-otp',
         ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'otp': otp}),
@@ -71,7 +71,7 @@ class _OtpScreenState extends State<OtpScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://039c-196-229-192-158.ngrok-free.app/api/auth/resend-otp',
+          'https://3e16-165-50-112-219.ngrok-free.app/api/auth/resend-otp',
         ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email}),
