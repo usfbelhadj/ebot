@@ -10,7 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
   final String baseUrl =
-      'https://3e16-165-50-112-219.ngrok-free.app/api'; // For Android emulator
+      'https://021b-165-50-112-219.ngrok-free.app/api'; // For Android emulator
   // Use 'http://10.0.2.2:5000/api' for iOS simulator
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 

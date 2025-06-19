@@ -46,6 +46,7 @@ class _EbotAppState extends State<EbotApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Quicklish',
+      debugShowCheckedModeBanner: false,
       theme: buildThemeData(), // defined in core/theme.dart
       home:
           _isLoading

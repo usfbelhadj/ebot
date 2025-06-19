@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      'https://3e16-165-50-112-219.ngrok-free.app/api'; // Android emulator
+      'https://021b-165-50-112-219.ngrok-free.app/api'; // Android emulator
   // Use 'http://10.0.2.2:5000/api' for iOS simulator
 
   // Check if user is logged in
